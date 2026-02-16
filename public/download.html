@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download - DarkApps</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+        .container{background:white;padding:40px;border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.1);max-width:500px;width:100%;text-align:center;}
+        h1{color:#333;margin-bottom:20px;font-size:2.2em;}
+        .file-info{background:#f8f9fa;padding:20px;border-radius:15px;margin:20px 0;}
+        .timer{font-size:4em;font-weight:bold;color:#667eea;margin:20px 0;}
+        .download-btn{background:linear-gradient(135deg,#28a745 0%,#20c997 100%);color:white;padding:20px 50px;border:none;border-radius:30px;font-size:1.3em;cursor:pointer;opacity:.5;transition:all .3s;margin:20px 0;}
+        .download-btn.active{opacity:1;transform:translateY(-3px);}
+        .popads{background:#fff3cd;border:2px dashed #ffc107;padding:20px;border-radius:15px;margin:20px 0;}
+        a{color:#667eea;text-decoration:none;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📥 Download</h1>
+        <div class="file-info" id="fileInfo">
+            <div id="filename">Carregando...</div>
+            <div id="filesize">-</div>
+        </div>
+        
+        <div class="popads">
+            ⏳ Aguarde <span id="timer">15</span>s<br>
+            <small>👈 Clique nos anúncios para ganhar!</small>
+        </div>
+        
+        <a href="#" class="download-btn" id="downloadBtn">💾 Baixar Agora</a>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const fileId = urlParams.get('file') || window.location.pathname.split('/').pop();
+        
+        // Timer 15s
+        let timeLeft = 15;
+        const timerEl = document.getElementById('timer');
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        const interval = setInterval(()=>{
+            timeLeft--;
+            timerEl.textContent = timeLeft;
+            if(timeLeft<=0){
+                clearInterval(interval);
+                downloadBtn.href = `/uploads/${fileId}`;
+                downloadBtn.classList.add('active');
+                downloadBtn.textContent = '🚀 Download Liberado!';
+            }
+        },1000);
+
+        // Info arquivo
+        fetch(`/uploads/${fileId}`).then(r=>r.blob()).then(blob=>{
+            document.getElementById('filename').textContent = fileId;
+            document.getElementById('filesize').textContent = `${Math.round(blob.size/1024/1024*100)/100}MB`;
+        });
+    </script>
+</body>
+</html>
