@@ -1,134 +1,52 @@
-<?php
-$id = $_GET['id'] ?? '';
-if (!$id || !file_exists("data/$id.json")) {
-    http_response_code(404);
-    die('<h1 style="color:red;text-align:center;padding:100px;font-family:Courier;">❌ Arquivo não encontrado</h1>');
-}
-
-$data = json_decode(file_get_contents("data/$id.json"), true);
-$data['views']++;
-$data['earnings'] += 0.05; // R$0,05 por view
-file_put_contents("data/$id.json", json_encode($data));
-?>
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DarkApps - <?= htmlspecialchars($data['name']) ?></title>
-    <!-- POPADS PRINCIPAL -->
-    <script async src="//www.popads.net/pop.js"></script>
+    <title>Download - <%= file.name %></title>
+    <meta name="viewport" content="width=device-width">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: linear-gradient(135deg, #000000 0%, #1a0033 50%, #0f0f23 100%);
-            color: #00ff88; 
-            font-family: 'Courier New', monospace; 
-            text-align: center; 
-            padding: 20px;
-            min-height: 100vh;
-        }
-        .dlbox { 
-            background: rgba(0,0,0,0.95); 
-            max-width: 700px; 
-            margin: 50px auto; 
-            padding: 60px 40px; 
-            border: 4px solid #00ff88; 
-            border-radius: 30px; 
-            box-shadow: 0 0 100px rgba(0,255,136,0.5);
-            backdrop-filter: blur(20px);
-        }
-        h1 { 
-            font-size: 2.8em; 
-            margin-bottom: 25px; 
-            text-shadow: 0 0 40px #00ff88;
-            word-break: break-word;
-        }
-        .file-info { 
-            font-size: 1.5em; 
-            margin: 30px 0; 
-            opacity: 0.9;
-            background: rgba(0,255,136,0.1);
-            padding: 20px;
-            border-radius: 15px;
-        }
-        #timer { 
-            font-size: 10em; 
-            background: linear-gradient(45deg, #ff0080, #ff6600, #ffaa00); 
-            color: #000; 
-            border-radius: 50%; 
-            width: 300px; 
-            height: 300px; 
-            margin: 50px auto; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: bold;
-            box-shadow: 0 0 80px rgba(255,100,0,0.6);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
-        .waiting { font-size: 2em; margin: 30px 0; }
-        #dlbtn { 
-            background: linear-gradient(45deg, #00ff88, #00cc6a); 
-            color: #000; 
-            padding: 30px 80px; 
-            font-size: 28px; 
-            border: none; 
-            border-radius: 60px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            box-shadow: 0 20px 50px rgba(0,255,136,0.6);
-            transition: all 0.3s;
-        }
-        #dlbtn:hover { transform: translateY(-10px) scale(1.1); }
-        #dlbtn:disabled { opacity: 0.5; cursor: not-allowed; }
-        @media (max-width: 768px) {
-            #timer { font-size: 6em; width: 220px; height: 220px; }
-            .dlbox { padding: 40px 20px; margin: 20px; }
-            h1 { font-size: 2em; }
-            #dlbtn { padding: 25px 50px; font-size: 22px; }
-        }
+        body{background:linear-gradient(45deg,#1a1a2e,#16213e);color:#fff;font-family:Arial;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+        .card{background:rgba(255,255,255,0.1);padding:40px;border-radius:20px;backdrop-filter:blur(20px);text-align:center;max-width:500px;width:100%;box-shadow:0 20px 40px rgba(0,0,0,0.3)}
+        h1{font-size:2.5em;margin-bottom:20px;text-shadow:0 0 20px #00f5ff}
+        .file-info{margin:30px 0;font-size:1.3em;color:#00f5ff}
+        .timer{display:flex;align-items:center;justify-content:center;font-size:3em;font-weight:bold;margin:30px 0;color:#ff6b6b;text-shadow:0 0 20px #ff6b6b}
+        .download-btn{display:block;width:100%;padding:20px;background:linear-gradient(45deg,#00f5ff,#0099cc);border:none;border-radius:15px;color:#000;font-size:1.5em;font-weight:bold;margin-top:30px;cursor:pointer;transition:all 0.3s;text-decoration:none}
+        .download-btn:hover{transform:scale(1.05);box-shadow:0 15px 35px rgba(0,245,255,0.4)}
+        .ads{margin:20px 0;padding:20px;background:rgba(255,255,255,0.05);border-radius:10px}
+        @media(max-width:600px){.card{padding:30px}}
     </style>
 </head>
 <body>
-    <div class="dlbox">
-        <h1>📱 <?= htmlspecialchars($data['name']) ?></h1>
+    <div class="card">
+        <h1>⏳ Aguarde Download</h1>
         <div class="file-info">
-            📊 <?= round($data['size'] / 1024 / 1024, 1) ?> MB<br>
-            👁️ <?= $data['views'] ?> views • 💰 R$<?= number_format($data['earnings'], 2) ?>
+            📁 <strong><%= file.name %></strong><br>
+            📊 <%= file.size %>
         </div>
         
-        <div id="countdown" style="display:none;">
-            <div id="timer">15</div>
-            <p class="waiting">⏳ Carregando anúncios...</p>
+        <!-- ADS OBRIGATÓRIOS -->
+        <div class="ads">
+            <script type="text/javascript" src="//www.popads.net/pop.js"></script>
+            <iframe src="https://www.popads.net/ads.php" width="100%" height="200" frameborder="0"></iframe>
         </div>
         
-        <button id="dlbtn" onclick="startDownload()">🚀 BAIXAR AGORA</button>
+        <div class="timer" id="timer">15</div>
+        <a href="/download/<%= file.id %>" class="download-btn" id="downloadBtn" style="pointer-events:none">📥 BAIXAR AGORA</a>
     </div>
 
     <script>
-        let timeLeft = 15;
-        let downloadUrl = '<?= $data['path'] ?>';
-        let interval;
-
-        function startDownload() {
-            // PopAds já carrega automaticamente
-            try { popunder(); } catch(e) {}
-            
-            document.getElementById('dlbtn').style.display = 'none';
-            document.getElementById('countdown').style.display = 'block';
-            
-            interval = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer').textContent = timeLeft;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(interval);
-                    window.location.href = downloadUrl;
-                }
-            }, 1000);
-        }
+        let time = 15;
+        const timer = document.getElementById('timer');
+        const btn = document.getElementById('downloadBtn');
+        
+        const interval = setInterval(() => {
+            time--;
+            timer.textContent = time;
+            if (time <= 0) {
+                clearInterval(interval);
+                btn.style.pointerEvents = 'auto';
+                btn.innerHTML = '🚀 DOWNLOAD RÁPIDO!';
+            }
+        }, 1000);
     </script>
 </body>
 </html>
