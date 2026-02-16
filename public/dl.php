@@ -1,0 +1,134 @@
+<?php
+$id = $_GET['id'] ?? '';
+if (!$id || !file_exists("data/$id.json")) {
+    http_response_code(404);
+    die('<h1 style="color:red;text-align:center;padding:100px;font-family:Courier;">❌ Arquivo não encontrado</h1>');
+}
+
+$data = json_decode(file_get_contents("data/$id.json"), true);
+$data['views']++;
+$data['earnings'] += 0.05; // R$0,05 por view
+file_put_contents("data/$id.json", json_encode($data));
+?>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkApps - <?= htmlspecialchars($data['name']) ?></title>
+    <!-- POPADS PRINCIPAL -->
+    <script async src="//www.popads.net/pop.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: linear-gradient(135deg, #000000 0%, #1a0033 50%, #0f0f23 100%);
+            color: #00ff88; 
+            font-family: 'Courier New', monospace; 
+            text-align: center; 
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .dlbox { 
+            background: rgba(0,0,0,0.95); 
+            max-width: 700px; 
+            margin: 50px auto; 
+            padding: 60px 40px; 
+            border: 4px solid #00ff88; 
+            border-radius: 30px; 
+            box-shadow: 0 0 100px rgba(0,255,136,0.5);
+            backdrop-filter: blur(20px);
+        }
+        h1 { 
+            font-size: 2.8em; 
+            margin-bottom: 25px; 
+            text-shadow: 0 0 40px #00ff88;
+            word-break: break-word;
+        }
+        .file-info { 
+            font-size: 1.5em; 
+            margin: 30px 0; 
+            opacity: 0.9;
+            background: rgba(0,255,136,0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        #timer { 
+            font-size: 10em; 
+            background: linear-gradient(45deg, #ff0080, #ff6600, #ffaa00); 
+            color: #000; 
+            border-radius: 50%; 
+            width: 300px; 
+            height: 300px; 
+            margin: 50px auto; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: bold;
+            box-shadow: 0 0 80px rgba(255,100,0,0.6);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
+        .waiting { font-size: 2em; margin: 30px 0; }
+        #dlbtn { 
+            background: linear-gradient(45deg, #00ff88, #00cc6a); 
+            color: #000; 
+            padding: 30px 80px; 
+            font-size: 28px; 
+            border: none; 
+            border-radius: 60px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            box-shadow: 0 20px 50px rgba(0,255,136,0.6);
+            transition: all 0.3s;
+        }
+        #dlbtn:hover { transform: translateY(-10px) scale(1.1); }
+        #dlbtn:disabled { opacity: 0.5; cursor: not-allowed; }
+        @media (max-width: 768px) {
+            #timer { font-size: 6em; width: 220px; height: 220px; }
+            .dlbox { padding: 40px 20px; margin: 20px; }
+            h1 { font-size: 2em; }
+            #dlbtn { padding: 25px 50px; font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dlbox">
+        <h1>📱 <?= htmlspecialchars($data['name']) ?></h1>
+        <div class="file-info">
+            📊 <?= round($data['size'] / 1024 / 1024, 1) ?> MB<br>
+            👁️ <?= $data['views'] ?> views • 💰 R$<?= number_format($data['earnings'], 2) ?>
+        </div>
+        
+        <div id="countdown" style="display:none;">
+            <div id="timer">15</div>
+            <p class="waiting">⏳ Carregando anúncios...</p>
+        </div>
+        
+        <button id="dlbtn" onclick="startDownload()">🚀 BAIXAR AGORA</button>
+    </div>
+
+    <script>
+        let timeLeft = 15;
+        let downloadUrl = '<?= $data['path'] ?>';
+        let interval;
+
+        function startDownload() {
+            // PopAds já carrega automaticamente
+            try { popunder(); } catch(e) {}
+            
+            document.getElementById('dlbtn').style.display = 'none';
+            document.getElementById('countdown').style.display = 'block';
+            
+            interval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    window.location.href = downloadUrl;
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
